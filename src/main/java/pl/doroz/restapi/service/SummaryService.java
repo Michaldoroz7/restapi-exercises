@@ -1,8 +1,8 @@
 package pl.doroz.restapi.service;
 
 import org.springframework.stereotype.Service;
-import pl.doroz.restapi.enums.Department;
-import pl.doroz.restapi.model.Employee;
+import pl.doroz.restapi.entity.Department;
+import pl.doroz.restapi.entity.Employee;
 
 import java.util.*;
 import java.util.stream.Collectors;

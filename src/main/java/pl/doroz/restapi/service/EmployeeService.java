@@ -2,12 +2,13 @@ package pl.doroz.restapi.service;
 
 
 import org.springframework.stereotype.Service;
-import pl.doroz.restapi.DTO.EmployeeDTO;
-import pl.doroz.restapi.model.Employee;
+import pl.doroz.restapi.entity.Employee;
+import pl.doroz.restapi.entity.EmployeeDTO;
 import pl.doroz.restapi.repository.EmployeeRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,18 +21,15 @@ public class EmployeeService {
     }
 
     public List<Employee> getAllEmployees() {
-        if (employeeRepository.getAllEmployees().isEmpty()) {
+        List<Employee> employees = employeeRepository.getAllEmployees();
+        if (employees.isEmpty()) {
             return new ArrayList<>();
         }
-        return employeeRepository.getAllEmployees();
+        return employees;
     }
 
     public List<EmployeeDTO> getAllEmployeeDTOs() {
-
-        if (this.employeeRepository.getAllEmployees().isEmpty()) {
-            return new ArrayList<>();
-        }
-        return this.getAllEmployees().stream()
+        return employeeRepository.getAllEmployees().stream()
                 .map(EmployeeDTO::new)
                 .collect(Collectors.toList());
     }
@@ -40,29 +38,29 @@ public class EmployeeService {
         return employeeRepository.getEmployeeById(id);
     }
 
-    public EmployeeDTO getEmployeeDTOById(Long id) {
-        Employee employee = this.getEmployeeById(id);
-        if (employee == null) {
-            return null;
-        }
-        return new EmployeeDTO(employee);
+    public Optional<EmployeeDTO> getEmployeeDTOById(Long id) {
+        Optional<Employee> employee = Optional.ofNullable(employeeRepository.getEmployeeById(id));
+        return employee.map(EmployeeDTO::new);
     }
 
     public boolean updateEmployeeSalary(Long id, Integer newSalary) {
-        Employee employee = getEmployeeById(id);
-        if (employee == null) {
+        Optional<Employee> employeeOpt = Optional.ofNullable(employeeRepository.getEmployeeById(id));
+        if (employeeOpt.isEmpty()) {
             return false;
         }
+        Employee employee = employeeOpt.get();
         employee.setSalary(newSalary);
         employeeRepository.updateEmployee(id, employee);
         return true;
     }
 
     public boolean updateEmployee(Long id, EmployeeDTO employeeDTO) {
-        Employee existingEmployee = this.getEmployeeById(id);
-        if (existingEmployee == null) {
+        Optional<Employee> employeeOpt = Optional.ofNullable(employeeRepository.getEmployeeById(id));
+        if (employeeOpt.isEmpty()) {
             return false;
         }
+
+        Employee existingEmployee = employeeOpt.get();
 
         if (employeeDTO.getName() != null) {
             existingEmployee.setName(employeeDTO.getName());
@@ -79,23 +77,23 @@ public class EmployeeService {
     }
 
     public boolean removeEmployeeById(Long id) {
-        Employee employee = getEmployeeById(id);
-        if (employee == null) {
+        Optional<Employee> employeeOpt = Optional.ofNullable(employeeRepository.getEmployeeById(id));
+        if (employeeOpt.isEmpty()) {
             return false;
         }
         employeeRepository.removeEmployeeById(id);
         return true;
     }
 
-    public Long createEmployee(EmployeeDTO employeeDTO) {
+    public Optional<Long> createEmployee(EmployeeDTO employeeDTO) {
         if (employeeDTO == null) {
-            return null;
+           return Optional.empty();
         }
 
         Employee employee = new Employee(employeeDTO);
-        Long id = (long) (this.getAllEmployees().size() + 1);
+        Long id = (long) (employeeRepository.getAllEmployees().size() + 1);
         employeeRepository.addEmployee(id, employee);
 
-        return id;
+        return Optional.of(id);
     }
 }

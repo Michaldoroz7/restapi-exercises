@@ -3,9 +3,9 @@ package pl.doroz.restapi.service;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import pl.doroz.restapi.DTO.EmployeeDTO;
-import pl.doroz.restapi.enums.Department;
-import pl.doroz.restapi.model.Employee;
+import pl.doroz.restapi.entity.EmployeeDTO;
+import pl.doroz.restapi.entity.Department;
+import pl.doroz.restapi.entity.Employee;
 import pl.doroz.restapi.repository.EmployeeRepository;
 
 import java.util.ArrayList;

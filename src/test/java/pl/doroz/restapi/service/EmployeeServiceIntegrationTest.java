@@ -5,9 +5,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import pl.doroz.restapi.DTO.EmployeeDTO;
-import pl.doroz.restapi.enums.Department;
-import pl.doroz.restapi.model.Employee;
+import pl.doroz.restapi.entity.EmployeeDTO;
+import pl.doroz.restapi.entity.Department;
+import pl.doroz.restapi.entity.Employee;
 import pl.doroz.restapi.repository.EmployeeRepository;
 
 import java.util.List;

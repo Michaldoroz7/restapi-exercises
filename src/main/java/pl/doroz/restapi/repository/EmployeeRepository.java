@@ -1,7 +1,7 @@
 package pl.doroz.restapi.repository;
 
 import org.springframework.stereotype.Repository;
-import pl.doroz.restapi.model.Employee;
+import pl.doroz.restapi.entity.Employee;
 
 import java.util.ArrayList;
 import java.util.HashMap;

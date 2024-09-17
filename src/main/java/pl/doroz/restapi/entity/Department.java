@@ -1,4 +1,4 @@
-package pl.doroz.restapi.enums;
+package pl.doroz.restapi.entity;
 
 public enum Department {
 

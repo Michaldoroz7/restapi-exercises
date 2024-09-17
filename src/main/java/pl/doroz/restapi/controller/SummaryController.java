@@ -3,8 +3,8 @@ package pl.doroz.restapi.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pl.doroz.restapi.enums.Department;
-import pl.doroz.restapi.model.Employee;
+import pl.doroz.restapi.entity.Department;
+import pl.doroz.restapi.entity.Employee;
 import pl.doroz.restapi.service.SummaryService;
 
 import java.util.Map;

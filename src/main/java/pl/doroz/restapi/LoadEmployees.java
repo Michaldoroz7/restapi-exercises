@@ -3,8 +3,8 @@ package pl.doroz.restapi;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import pl.doroz.restapi.enums.Department;
-import pl.doroz.restapi.model.Employee;
+import pl.doroz.restapi.entity.Department;
+import pl.doroz.restapi.entity.Employee;
 import pl.doroz.restapi.repository.EmployeeRepository;
 
 import java.util.logging.Logger;

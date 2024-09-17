@@ -1,9 +1,7 @@
-package pl.doroz.restapi.DTO;
+package pl.doroz.restapi.entity;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import pl.doroz.restapi.enums.Department;
-import pl.doroz.restapi.model.Employee;
 
 @Data
 @NoArgsConstructor
