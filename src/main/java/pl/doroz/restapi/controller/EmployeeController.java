@@ -1,7 +1,9 @@
 package pl.doroz.restapi.controller;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import pl.doroz.restapi.entity.EmployeeRequest;
 import pl.doroz.restapi.entity.EmployeeResponse;
@@ -12,6 +14,7 @@ import java.util.Optional;
 
 @RestController("/employees")
 @AllArgsConstructor
+@Validated
 public class EmployeeController {
 
     private final EmployeeService employeeService;
@@ -19,9 +22,9 @@ public class EmployeeController {
 
     @GetMapping("/{id}")
     public ResponseEntity<EmployeeResponse> getEmployeeById(@PathVariable Long id) {
-        Optional<EmployeeResponse> employee = employeeService.getEmployeeDTOById(id);
-        return employee.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        EmployeeResponse employee = employeeService.getEmployeeDTOById(id);
+        return ResponseEntity.ok(employee);
+
     }
 
     @GetMapping("/")
@@ -32,27 +35,26 @@ public class EmployeeController {
 
     @PutMapping("/{id}/salary")
     public ResponseEntity<Void> updateEmployeeSalary(@PathVariable Long id, @RequestBody Integer newSalary) {
-        boolean isUpdated = employeeService.updateEmployeeSalary(id, newSalary);
-        return isUpdated ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
+        employeeService.updateEmployeeSalary(id, newSalary);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> removeEmployee(@PathVariable Long id) {
-        boolean isRemoved = employeeService.removeEmployeeById(id);
-        return isRemoved ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
+        employeeService.removeEmployeeById(id);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping
-    public ResponseEntity<Long> createEmployee(@RequestBody EmployeeRequest employeeRequest) {
+    public ResponseEntity<Long> createEmployee(@Valid @RequestBody EmployeeRequest employeeRequest) {
         Optional<Long> id = employeeService.createEmployee(employeeRequest);
-        return id.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.badRequest().build());
+        return ResponseEntity.ok(id.get());
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Void> updateEmployee(@PathVariable Long id, @RequestBody EmployeeRequest employeeRequest) {
-        boolean isUpdated = employeeService.updateEmployee(id, employeeRequest);
-        return isUpdated ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
+        employeeService.updateEmployee(id, employeeRequest);
+        return ResponseEntity.ok().build();
     }
 
 }

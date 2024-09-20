@@ -17,7 +17,7 @@ public class Employee {
 
     private Department department;
 
-    private int salary;
+    private Integer salary;
 
     public static Employee mapFromRequestToEmployee(EmployeeRequest employeeRequest) {
         return Employee.builder()
