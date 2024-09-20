@@ -1,12 +1,14 @@
 package pl.doroz.restapi.entity;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Employee {
 
     private Long id;
@@ -17,10 +19,12 @@ public class Employee {
 
     private int salary;
 
-    public Employee(EmployeeDTO employeeDTO) {
-        this.id = employeeDTO.getId();
-        this.name = employeeDTO.getName();
-        this.department = employeeDTO.getDepartment();
-        this.salary = employeeDTO.getSalary();
+    public static Employee mapFromRequestToEmployee(EmployeeRequest employeeRequest) {
+        return Employee.builder()
+                .name(employeeRequest.getName())
+                .department(employeeRequest.getDepartment())
+                .salary(employeeRequest.getSalary())
+                .build();
+
     }
 }

@@ -6,6 +6,7 @@ import pl.doroz.restapi.entity.Employee;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class SummaryService {
@@ -17,53 +18,40 @@ public class SummaryService {
     }
 
     public Map<Department, Integer> getDepartmentEmployees() {
-        List<Employee> employees = employeeService.getAllEmployees();
-
-        Map<Department, Integer> departmentEmployees = new HashMap<>();
-        departmentEmployees.put(Department.IT, getEmployeeByDepartment(Department.IT, employees).size());
-        departmentEmployees.put(Department.HR, getEmployeeByDepartment(Department.HR, employees).size());
-        departmentEmployees.put(Department.MARKETING, getEmployeeByDepartment(Department.MARKETING, employees).size());
-        return departmentEmployees;
+        return Stream.of(Department.values())
+                .collect(Collectors.toMap(department -> department, department -> getEmployeeByDepartment(department, employeeService.getAllEmployees())));
     }
 
-    public Employee getLowestSalaryEmployee() {
-        List<Employee> employees = employeeService.getAllEmployees();
-        return employees.stream()
-                .min(Comparator.comparingInt(Employee::getSalary))
-                .orElse(null);
+    public Optional<Employee> getLowestSalaryEmployee() {
+        return employeeService.getAllEmployees().stream()
+                .min(Comparator.comparingInt(Employee::getSalary));
     }
 
-    public Employee getHighestSalaryEmployee() {
-        List<Employee> employees = employeeService.getAllEmployees();
-        return employees.stream()
-                .max(Comparator.comparingInt(Employee::getSalary))
-                .orElse(null);
+    public Optional<Employee> getHighestSalaryEmployee() {
+        return employeeService.getAllEmployees().stream()
+                .max(Comparator.comparingInt(Employee::getSalary));
     }
 
     public int getSummarizedSalaries() {
-        List<Employee> employees = employeeService.getAllEmployees();
-        return employees.stream()
+        return employeeService.getAllEmployees().stream()
                 .mapToInt(Employee::getSalary)
                 .sum();
     }
 
-    public int getAverageOfAllSalaries() {
-        List<Employee> employees = employeeService.getAllEmployees();
-        return (int) employees.stream()
+    public OptionalDouble getAverageOfAllSalaries() {
+        return employeeService.getAllEmployees().stream()
                 .mapToInt(Employee::getSalary)
-                .average()
-                .orElse(0);
+                .average();
     }
 
     public int getTotalEmployees() {
-        List<Employee> employees = employeeService.getAllEmployees();
-        return employees.size();
+        return  employeeService.getAllEmployees().size();
     }
 
 
-    private Set<Employee> getEmployeeByDepartment(Department department, List<Employee> employees) {
+    private int getEmployeeByDepartment(Department department, List<Employee> employees) {
         return employees.stream()
                 .filter(employee -> employee.getDepartment() == department)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toSet()).size();
     }
 }

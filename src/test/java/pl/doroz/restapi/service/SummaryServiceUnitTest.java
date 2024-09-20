@@ -5,9 +5,7 @@ import pl.doroz.restapi.entity.Department;
 import pl.doroz.restapi.entity.Employee;
 import pl.doroz.restapi.repository.EmployeeRepository;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -33,8 +31,8 @@ public class SummaryServiceUnitTest {
         when(employeeRepository.getAllEmployees()).thenReturn(Arrays.asList(employeeLowest, employee2, employee3));
 
         //When
-        Employee expectedEmployee = employeeLowest;
-        Employee actualEmployee = summaryService.getLowestSalaryEmployee();
+        Optional<Employee> expectedEmployee = Optional.of(employeeLowest);
+        Optional<Employee> actualEmployee = summaryService.getLowestSalaryEmployee();
 
         //Then
         assertEquals(expectedEmployee, actualEmployee);
@@ -53,8 +51,8 @@ public class SummaryServiceUnitTest {
         when(employeeRepository.getAllEmployees()).thenReturn(Arrays.asList(employee1, employee2, employeeHighest));
 
         //When
-        Employee expectedEmployee = employeeHighest;
-        Employee actualEmployee = summaryService.getHighestSalaryEmployee();
+        Optional<Employee> expectedEmployee = Optional.of(employeeHighest);
+        Optional<Employee> actualEmployee = summaryService.getHighestSalaryEmployee();
 
         //Then
         assertEquals(expectedEmployee, actualEmployee);
@@ -93,11 +91,11 @@ public class SummaryServiceUnitTest {
         when(employeeRepository.getAllEmployees()).thenReturn(Arrays.asList(employee1, employee2, employee3));
 
         //When
-        int expectedAverage = (int) Stream.of(employee1, employee2, employee3)
+        OptionalDouble expectedAverage = OptionalDouble.of((Stream.of(employee1, employee2, employee3)
                 .mapToInt(Employee::getSalary)
                 .average()
-                .orElse(0);
-        int actualAverage = summaryService.getAverageOfAllSalaries();
+                .orElse(0)));
+        OptionalDouble actualAverage = summaryService.getAverageOfAllSalaries();
 
         //Then
         assertEquals(expectedAverage, actualAverage);

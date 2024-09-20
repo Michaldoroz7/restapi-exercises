@@ -6,6 +6,7 @@ import pl.doroz.restapi.entity.Employee;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 
 @Repository
@@ -21,8 +22,8 @@ public class EmployeeRepository {
         repository.put(id, employee);
     }
 
-    public Employee getEmployeeById(Long id) {
-        return repository.get(id);
+    public Optional<Employee> getEmployeeById(Long id) {
+        return Optional.ofNullable(repository.get(id));
     }
 
     public List<Employee> getAllEmployees() {

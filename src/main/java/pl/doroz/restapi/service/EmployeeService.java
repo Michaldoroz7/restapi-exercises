@@ -3,10 +3,10 @@ package pl.doroz.restapi.service;
 
 import org.springframework.stereotype.Service;
 import pl.doroz.restapi.entity.Employee;
-import pl.doroz.restapi.entity.EmployeeDTO;
+import pl.doroz.restapi.entity.EmployeeRequest;
+import pl.doroz.restapi.entity.EmployeeResponse;
 import pl.doroz.restapi.repository.EmployeeRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -21,30 +21,26 @@ public class EmployeeService {
     }
 
     public List<Employee> getAllEmployees() {
-        List<Employee> employees = employeeRepository.getAllEmployees();
-        if (employees.isEmpty()) {
-            return new ArrayList<>();
-        }
-        return employees;
+        return employeeRepository.getAllEmployees();
     }
 
-    public List<EmployeeDTO> getAllEmployeeDTOs() {
+    public List<EmployeeResponse> getAllEmployeeDTOs() {
         return employeeRepository.getAllEmployees().stream()
-                .map(EmployeeDTO::new)
+                .map(EmployeeResponse::mapEmployeeToResponse)
                 .collect(Collectors.toList());
     }
 
-    public Employee getEmployeeById(Long id) {
+    public Optional<Employee> getEmployeeById(Long id) {
         return employeeRepository.getEmployeeById(id);
     }
 
-    public Optional<EmployeeDTO> getEmployeeDTOById(Long id) {
-        Optional<Employee> employee = Optional.ofNullable(employeeRepository.getEmployeeById(id));
-        return employee.map(EmployeeDTO::new);
+    public Optional<EmployeeResponse> getEmployeeDTOById(Long id) {
+        Optional<Employee> employee = employeeRepository.getEmployeeById(id);
+        return employee.map(EmployeeResponse::mapEmployeeToResponse);
     }
 
     public boolean updateEmployeeSalary(Long id, Integer newSalary) {
-        Optional<Employee> employeeOpt = Optional.ofNullable(employeeRepository.getEmployeeById(id));
+        Optional<Employee> employeeOpt = employeeRepository.getEmployeeById(id);
         if (employeeOpt.isEmpty()) {
             return false;
         }
@@ -54,22 +50,22 @@ public class EmployeeService {
         return true;
     }
 
-    public boolean updateEmployee(Long id, EmployeeDTO employeeDTO) {
-        Optional<Employee> employeeOpt = Optional.ofNullable(employeeRepository.getEmployeeById(id));
+    public boolean updateEmployee(Long id, EmployeeRequest employeeRequest) {
+        Optional<Employee> employeeOpt = employeeRepository.getEmployeeById(id);
         if (employeeOpt.isEmpty()) {
             return false;
         }
 
         Employee existingEmployee = employeeOpt.get();
 
-        if (employeeDTO.getName() != null) {
-            existingEmployee.setName(employeeDTO.getName());
+        if (employeeRequest.getName() != null) {
+            existingEmployee.setName(employeeRequest.getName());
         }
-        if (employeeDTO.getDepartment() != null) {
-            existingEmployee.setDepartment(employeeDTO.getDepartment());
+        if (employeeRequest.getDepartment() != null) {
+            existingEmployee.setDepartment(employeeRequest.getDepartment());
         }
-        if (employeeDTO.getSalary() != 0) {
-            existingEmployee.setSalary(employeeDTO.getSalary());
+        if (employeeRequest.getSalary() != 0) {
+            existingEmployee.setSalary(employeeRequest.getSalary());
         }
 
         employeeRepository.updateEmployee(id, existingEmployee);
@@ -77,7 +73,7 @@ public class EmployeeService {
     }
 
     public boolean removeEmployeeById(Long id) {
-        Optional<Employee> employeeOpt = Optional.ofNullable(employeeRepository.getEmployeeById(id));
+        Optional<Employee> employeeOpt = employeeRepository.getEmployeeById(id);
         if (employeeOpt.isEmpty()) {
             return false;
         }
@@ -85,13 +81,14 @@ public class EmployeeService {
         return true;
     }
 
-    public Optional<Long> createEmployee(EmployeeDTO employeeDTO) {
-        if (employeeDTO == null) {
-           return Optional.empty();
+    public Optional<Long> createEmployee(EmployeeRequest employeeRequest) {
+        if (employeeRequest == null) {
+            return Optional.empty();
         }
 
-        Employee employee = new Employee(employeeDTO);
+        Employee employee = Employee.mapFromRequestToEmployee(employeeRequest);
         Long id = (long) (employeeRepository.getAllEmployees().size() + 1);
+        employee.setId(id);
         employeeRepository.addEmployee(id, employee);
 
         return Optional.of(id);

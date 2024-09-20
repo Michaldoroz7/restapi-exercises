@@ -1,38 +1,33 @@
 package pl.doroz.restapi.controller;
 
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pl.doroz.restapi.entity.EmployeeDTO;
+import pl.doroz.restapi.entity.EmployeeRequest;
+import pl.doroz.restapi.entity.EmployeeResponse;
 import pl.doroz.restapi.service.EmployeeService;
-import pl.doroz.restapi.service.SummaryService;
 
 import java.util.List;
 import java.util.Optional;
 
 @RestController("/employees")
+@AllArgsConstructor
 public class EmployeeController {
 
     private final EmployeeService employeeService;
 
-    public EmployeeController(EmployeeService employeeService, SummaryService summaryService) {
-        this.employeeService = employeeService;
-    }
-
 
     @GetMapping("/{id}")
-    public ResponseEntity<EmployeeDTO> getEmployeeById(@PathVariable Long id) {
-        Optional<EmployeeDTO> employee = employeeService.getEmployeeDTOById(id);
+    public ResponseEntity<EmployeeResponse> getEmployeeById(@PathVariable Long id) {
+        Optional<EmployeeResponse> employee = employeeService.getEmployeeDTOById(id);
         return employee.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @GetMapping("/")
-    public ResponseEntity<List<EmployeeDTO>> getAllEmployees() {
-        List<EmployeeDTO> employeeDTOS = employeeService.getAllEmployeeDTOs();
-        if (employeeDTOS.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(employeeDTOS);
+    public ResponseEntity<List<EmployeeResponse>> getAllEmployees() {
+        List<EmployeeResponse> employee = employeeService.getAllEmployeeDTOs();
+        return ResponseEntity.ok(employee);
     }
 
     @PutMapping("/{id}/salary")
@@ -48,15 +43,15 @@ public class EmployeeController {
     }
 
     @PostMapping
-    public ResponseEntity<Long> createEmployee(@RequestBody EmployeeDTO employeeDTO) {
-        Optional<Long> id = employeeService.createEmployee(employeeDTO);
+    public ResponseEntity<Long> createEmployee(@RequestBody EmployeeRequest employeeRequest) {
+        Optional<Long> id = employeeService.createEmployee(employeeRequest);
         return id.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+                .orElseGet(() -> ResponseEntity.badRequest().build());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateEmployee(@PathVariable Long id, @RequestBody EmployeeDTO employeeDTO) {
-        boolean isUpdated = employeeService.updateEmployee(id, employeeDTO);
+    public ResponseEntity<Void> updateEmployee(@PathVariable Long id, @RequestBody EmployeeRequest employeeRequest) {
+        boolean isUpdated = employeeService.updateEmployee(id, employeeRequest);
         return isUpdated ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
     }
 

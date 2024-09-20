@@ -5,12 +5,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import pl.doroz.restapi.entity.EmployeeDTO;
 import pl.doroz.restapi.entity.Department;
 import pl.doroz.restapi.entity.Employee;
+import pl.doroz.restapi.entity.EmployeeRequest;
+import pl.doroz.restapi.entity.EmployeeResponse;
 import pl.doroz.restapi.repository.EmployeeRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @SpringBootTest
 public class EmployeeServiceIntegrationTest {
@@ -21,7 +23,9 @@ public class EmployeeServiceIntegrationTest {
     @Autowired
     private EmployeeService employeeService;
 
-    private EmployeeDTO testEmployeeDto;
+    private EmployeeRequest employeeRequest;
+
+    private EmployeeResponse employeeResponse;
 
 
     @BeforeEach
@@ -29,13 +33,16 @@ public class EmployeeServiceIntegrationTest {
 
         employeeRepository.clearRepository();
 
-        testEmployeeDto = new EmployeeDTO();
-        testEmployeeDto.setId(1L);
-        testEmployeeDto.setName("Test Name");
-        testEmployeeDto.setDepartment(Department.MARKETING);
-        testEmployeeDto.setSalary(2000);
+        employeeRequest = new EmployeeRequest();
+        employeeRequest.setName("Test Name");
+        employeeRequest.setDepartment(Department.MARKETING);
+        employeeRequest.setSalary(2000);
 
-        employeeService.createEmployee(testEmployeeDto);
+        Employee employee = Employee.mapFromRequestToEmployee(employeeRequest);
+        employee.setId(1L);
+        employeeResponse = EmployeeResponse.mapEmployeeToResponse(employee);
+
+        employeeService.createEmployee(employeeRequest);
     }
 
     @Test
@@ -49,17 +56,17 @@ public class EmployeeServiceIntegrationTest {
 
         //Checking if employee fields match values given in setUp
         Employee employee = employees.get(0);
-        assertEmployeeFieldsMatch(employee, testEmployeeDto);
+        assertEmployeeFieldsMatch(Optional.ofNullable(employee), employeeRequest);
     }
 
     @Test
     void should_return_employee_by_id() {
 
         //Getting employee by id
-        Employee employee = employeeService.getEmployeeById(testEmployeeDto.getId());
+        Optional<Employee> employee = employeeService.getEmployeeById(employeeResponse.getId());
 
         //Checking if data is matched
-        assertEmployeeFieldsMatch(employee, testEmployeeDto);
+        assertEmployeeFieldsMatch(employee, employeeRequest);
     }
 
 
@@ -68,42 +75,41 @@ public class EmployeeServiceIntegrationTest {
 
         //Updating employee with new salary value
         int updatedSalary = 5000;
-        boolean isUpated = employeeService.updateEmployeeSalary(testEmployeeDto.getId(), updatedSalary);
+        boolean isUpated = employeeService.updateEmployeeSalary(employeeResponse.getId(), updatedSalary);
         Assertions.assertTrue(isUpated);
 
         //Checking if employeeService return employee with updated salary
-        Employee employee = employeeService.getEmployeeById(testEmployeeDto.getId());
-        Assertions.assertEquals(updatedSalary, employee.getSalary());
+        Optional<Employee> employee = employeeService.getEmployeeById(employeeResponse.getId());
+        Assertions.assertEquals(updatedSalary, employee.get().getSalary());
 
     }
 
     @Test
     void should_return_updated_employee() {
 
-        EmployeeDTO updatedEmployeeDto = createUpdatedEmployeeDTO(100, "Updated Name", Department.HR);
+        EmployeeRequest updatedEmployeeDto = createUpdatedEmployeeDTO(100, "Updated Name", Department.HR);
 
-        boolean isUpdated = employeeService.updateEmployee(testEmployeeDto.getId(), updatedEmployeeDto);
+        boolean isUpdated = employeeService.updateEmployee(employeeResponse.getId(), updatedEmployeeDto);
         Assertions.assertTrue(isUpdated);
 
         //Checking values
-        Employee employee = employeeService.getEmployeeById(testEmployeeDto.getId());
+        Optional<Employee> employee = employeeService.getEmployeeById(employeeResponse.getId());
         assertEmployeeFieldsMatch(employee, updatedEmployeeDto);
     }
 
-    private EmployeeDTO createUpdatedEmployeeDTO(int newSalary, String newName, Department newDepartment) {
+    private EmployeeRequest createUpdatedEmployeeDTO(int newSalary, String newName, Department newDepartment) {
 
-        EmployeeDTO updatedEmployeeDto = new EmployeeDTO();
-        updatedEmployeeDto.setId(testEmployeeDto.getId());
+        EmployeeRequest updatedEmployeeDto = new EmployeeRequest();
         updatedEmployeeDto.setName(newName);
         updatedEmployeeDto.setDepartment(newDepartment);
         updatedEmployeeDto.setSalary(newSalary);
         return updatedEmployeeDto;
     }
 
-    private void assertEmployeeFieldsMatch(Employee employee, EmployeeDTO updatedEmployeeDto) {
+    private void assertEmployeeFieldsMatch(Optional<Employee> employee, EmployeeRequest updatedEmployeeDto) {
 
-        Assertions.assertEquals(updatedEmployeeDto.getName(), employee.getName());
-        Assertions.assertEquals(updatedEmployeeDto.getDepartment(), employee.getDepartment());
-        Assertions.assertEquals(updatedEmployeeDto.getSalary(), employee.getSalary());
+        Assertions.assertEquals(updatedEmployeeDto.getName(), employee.get().getName());
+        Assertions.assertEquals(updatedEmployeeDto.getDepartment(), employee.get().getDepartment());
+        Assertions.assertEquals(updatedEmployeeDto.getSalary(), employee.get().getSalary());
     }
 }
