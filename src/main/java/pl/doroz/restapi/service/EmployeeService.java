@@ -11,6 +11,8 @@ import pl.doroz.restapi.repository.EmployeeRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,27 +40,27 @@ public class EmployeeService {
 
     public EmployeeResponse getEmployeeDTOById(Long id) {
         Employee employee = employeeRepository.getEmployeeById(id)
-                .orElseThrow(() -> new EmployeeNotFoundException("Employee not found with id:" + id));
+                .orElseThrow(() -> employeeNotFoundFunction().apply(id));
         return EmployeeResponse.mapEmployeeToResponse(employee);
     }
 
     public void updateEmployeeSalary(Long id, Integer newSalary) {
         Employee employee = employeeRepository.getEmployeeById(id)
-                .orElseThrow(() -> new EmployeeNotFoundException("Employee not found with id:" + id));
+                .orElseThrow(() -> employeeNotFoundFunction().apply(id));
         employee.setSalary(newSalary);
         employeeRepository.updateEmployee(id, employee);
     }
 
     public void updateEmployee(Long id, EmployeeRequest employeeRequest) {
         Employee employee = employeeRepository.getEmployeeById(id)
-                .orElseThrow(() -> new EmployeeBadRequestException("Bad request, check your data"));
+                .orElseThrow(() -> employeeNotFoundFunction().apply(id));
         Employee.mapFromRequestToEmployee(employeeRequest);
         employeeRepository.updateEmployee(id, employee);
     }
 
     public void removeEmployeeById(Long id) {
         employeeRepository.getEmployeeById(id)
-                .orElseThrow(() -> new EmployeeNotFoundException("Employee not found with id:" + id));
+                .orElseThrow(() -> employeeNotFoundFunction().apply(id));
         employeeRepository.removeEmployeeById(id);
     }
 
@@ -70,4 +72,9 @@ public class EmployeeService {
 
         return Optional.of(id).orElseThrow(() -> new EmployeeBadRequestException("Bad request, please check your data")).describeConstable();
     }
+
+    public Function<Long, EmployeeBadRequestException> employeeNotFoundFunction() {
+        return (id) -> new EmployeeBadRequestException("Employee with id " + id + " not found");
+    }
+
 }
