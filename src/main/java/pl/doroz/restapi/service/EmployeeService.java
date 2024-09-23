@@ -6,13 +6,11 @@ import pl.doroz.restapi.entity.Employee;
 import pl.doroz.restapi.entity.EmployeeRequest;
 import pl.doroz.restapi.entity.EmployeeResponse;
 import pl.doroz.restapi.handler.EmployeeBadRequestException;
-import pl.doroz.restapi.handler.EmployeeNotFoundException;
 import pl.doroz.restapi.repository.EmployeeRepository;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Service
@@ -73,7 +71,7 @@ public class EmployeeService {
         return Optional.of(id).orElseThrow(() -> new EmployeeBadRequestException("Bad request, please check your data")).describeConstable();
     }
 
-    public Function<Long, EmployeeBadRequestException> employeeNotFoundFunction() {
+    private Function<Long, EmployeeBadRequestException> employeeNotFoundFunction() {
         return (id) -> new EmployeeBadRequestException("Employee with id " + id + " not found");
     }
 
