@@ -54,4 +54,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler({OpinionNotFoundException.class})
+    public ResponseEntity<Object> handleOpinionNotFoundException(OpinionNotFoundException e) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(e.getMessage());
+    }
 }

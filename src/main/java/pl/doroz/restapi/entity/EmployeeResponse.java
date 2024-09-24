@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -19,12 +21,18 @@ public class EmployeeResponse {
 
     private int salary;
 
+    private List<OpinionResponse> opinions;
+
     public static EmployeeResponse mapEmployeeToResponse(Employee employee) {
         return EmployeeResponse.builder()
                 .id(employee.getId())
                 .name(employee.getName())
                 .department(employee.getDepartment())
                 .salary(employee.getSalary())
+                .opinions(employee.getOpinions()
+                        .stream()
+                        .map(OpinionResponse::mapOpinionToResponse)
+                        .toList())
                 .build();
     }
 }
